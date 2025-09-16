@@ -1,0 +1,14 @@
+Problem Statement :
+
+In the modern digital landscape, traditional shopping methods are increasingly being replaced by online platforms that offer greater convenience, accessibility, and efficiency. 
+However, developing a full-scale e-commerce application can be complex and resource-intensive.
+There is a need for a simplified, scalable, and easy-to-use solution that demonstrates the core functionalities of an online shopping system. 
+The problem this project addresses is the absence of a lightweight e-commerce platform that enables users to browse and purchase products, 
+while also allowing administrators to manage product listings and customer orders. 
+The proposed Mini E-Commerce System aims to solve this by providing a web-based application with essential features such as user authentication, product catalog, shopping cart, 
+and order processing, supported by an intuitive admin panel. 
+As online shopping becomes increasingly popular, users expect fast, accessible, and user-friendly platforms to meet their purchasing needs.
+However, building a full-featured e-commerce system requires extensive development time, complex infrastructure, and high costs. For educational or small business purposes. 
+There is a need for a miniature version of an e-commerce platform that captures the essential features without the overhead of large-scale development.
+The system is intended to be lightweight but structured, providing a foundational model for e-commerce development that can later be scaled or 
+extended with advanced features such as payment integration, real-time stock tracking, and analytics.
