@@ -1,0 +1,461 @@
+Source Code:
+
+import java.util.*;
+
+class Product {
+private int id;
+private String name;
+private double price;
+
+public Product(int id, String name, double price) {
+this.id = id;
+this.name = name;
+this.price = price;
+}
+
+public int getId() { return id; }
+public String getName() { return name; }
+public double getPrice() { return price; }
+@Override
+public String toString() {
+return id + ". " + name + " - $" + price;
+}
+}
+
+class CartItem {
+private Product product;
+private int quantity;
+
+public CartItem(Product product, int quantity) {
+this.product = product;
+this.quantity = quantity;
+}
+
+public double getTotal() {
+return product.getPrice() * quantity;
+}
+
+@Override
+public String toString() {
+return product.getName() + " x" + quantity + " = $" + getTotal();
+}
+}
+
+class User {
+private String username;
+private String password;
+
+public User(String username, String password) {
+this.username = username;
+this.password = password;
+}
+
+public String getUsername() { return username; }
+public boolean checkPassword(String inputPassword) {
+return this.password.equals(inputPassword);
+}
+}
+
+public class Ecommerce {
+private static List<Product> products = new ArrayList<>();
+private static List<CartItem> cart = new ArrayList<>();
+private static Map<String, User> users = new HashMap<>();
+private static Scanner scanner = new Scanner(System.in);
+private static User currentUser = null;
+
+public static void main(String[] args) {
+seedProducts();
+seedUsers();
+
+System.out.println("=== Welcome to Mini E-Commerce ===");
+login();
+
+int choice;
+do {
+System.out.println("\n1. View Products");
+System.out.println("2. View Cart");
+System.out.println("3. Checkout");
+System.out.println("4. Logout");
+System.out.println("0. Exit");
+System.out.print("Choose an option: ");
+choice = scanner.nextInt();
+
+switch (choice) {
+case 1:
+viewProducts();
+break;
+case 2:
+viewCart();
+break;
+case 3:
+checkout();
+break;
+case 4:
+login();
+break;
+case 0:
+System.out.println("Thank you for using Mini E-Commerce!");
+break;
+default:
+System.out.println("Invalid option.");
+break;
+}
+} while (choice != 0);
+}
+
+private static void seedProducts() {
+products.add(new Product(1, "T-Shirt", 15.0));
+products.add(new Product(2, "Jeans", 40.0));
+products.add(new Product(3, "Sneakers", 60.0));
+products.add(new Product(4, "Backpack", 35.0));
+products.add(new Product(1, "Classic Cotton T-Shirt", 15.0));
+products.add(new Product(2, "Slim Fit Blue Jeans", 40.0));
+products.add(new Product(3, "AirMax Running Sneakers", 60.0));
+products.add(new Product(4, "Urban Trek Backpack", 35.0));
+products.add(new Product(5, "Apple AirPods Pro", 249.0));
+products.add(new Product(6, "Samsung Galaxy Watch", 199.0));
+products.add(new Product(7, "Logitech Wireless Mouse", 29.99));
+products.add(new Product(8, "Sony WH-1000XM5 Headphones", 379.99));
+products.add(new Product(9, "Levi's Denim Jacket", 89.99));
+products.add(new Product(10, "Nike Sports Cap", 25.0));
+products.add(new Product(11, "Adidas Gym Bag", 55.0));
+products.add(new Product(12, "HP Pavilion Laptop", 699.0));
+products.add(new Product(13, "Amazon Kindle Paperwhite", 129.99)); 
+}
+private static void seedUsers() {
+users.put("Goutham", new User("Goutham", "1234"));
+users.put("Jahnavi", new User("Jahnavi", "pass"));
+users.put("Nithish", new User("Nithish", "mikepass"));
+users.put("Himaya", new User("sara", "himaya123"));
+users.put("Girisha", new User("david", "girisha456"));
+users.put("emma", new User("emma", "emma789"));
+users.put("admin", new User("admin", "admin@123"));
+}
+private static void login() {
+while (true) {
+System.out.print("\nEnter username: ");
+String username = scanner.next();
+System.out.print("Enter password: ");
+String password = scanner.next();
+
+User user = users.get(username);
+if (user != null && user.checkPassword(password)) {
+currentUser = user;
+System.out.println("Login successful. Welcome, " + currentUser.getUsername() + "!");
+cart.clear();
+break;
+} else {
+System.out.println("Invalid credentials. Please try again.");
+}
+}
+}
+private static void viewProducts() {
+while (true) {
+System.out.println("\n--- Product Catalog ---");
+for (Product p : products) {
+System.out.println(p);
+}
+System.out.print("Enter product ID to add to cart (0 to return): ");
+int id = scanner.nextInt();
+if (id == 0) break;
+Product selected = null;
+for (Product p : products) {
+if (p.getId() == id) {
+selected = p;
+break;
+}
+}
+if (selected != null) {
+System.out.print("Enter quantity: ");
+int quantity = scanner.nextInt();
+boolean found = false;
+for (CartItem item : cart) {
+if (item.toString().contains(selected.getName())) {
+// If product already exists in cart, update quantity
+int existingQty = item.toString().split("x").length > 1 ? Integer.parseInt(item.toString().split("x")[1].split("=")[0].trim()) : 0;
+cart.remove(item);
+cart.add(new CartItem(selected, existingQty + quantity));
+found = true;
+break;
+}
+}
+if (!found) {
+cart.add(new CartItem(selected, quantity));
+}
+System.out.println("Added to cart.");
+} else {
+System.out.println("Invalid product ID.");
+}
+}
+}
+private static void viewCart() {
+if (cart.isEmpty()) {
+System.out.println("\nYour cart is empty.");
+return;
+}
+System.out.println("\n--- Your Cart ---");
+double total = 0;
+for (CartItem item : cart) {
+System.out.println(item);
+total += item.getTotal();
+}
+System.out.println("Total Amount: $" + total);
+}
+private static void checkout() {
+if (cart.isEmpty()) {
+System.out.println("Cart is empty. Add products first.");
+return;
+}
+viewCart();
+System.out.print("Confirm checkout? (yes/no): ");
+String confirm = scanner.next();
+if (!confirm.equalsIgnoreCase("yes")) {
+System.out.println("Checkout cancelled.");
+return;
+}
+System.out.println("\n--- Payment Options ---");
+System.out.println("1. UPI");
+System.out.println("2. Credit/Debit Card");
+System.out.println("3. Cash on Delivery");
+System.out.print("Choose a payment method: ");
+int paymentOption = scanner.nextInt();
+switch (paymentOption) {
+case 1:
+System.out.print("Enter UPI ID (e.g., name@bank): ");
+String upiId = scanner.next();
+if (upiId.contains("@")) {
+System.out.println("Processing UPI payment...");
+simulateProcessing();
+System.out.println("Payment successful via UPI.");
+} else {
+System.out.println("Invalid UPI ID. Payment failed.");
+return;
+}
+break;
+case 2:
+System.out.print("Enter Card Number (16 digits): ");
+String cardNumber = scanner.next();
+System.out.print("Enter Expiry Date (MM/YY): ");
+System.out.print("Enter CVV (3 digits): ");
+String cvv = scanner.next();
+if (cardNumber.length() == 16 && cvv.length() == 3) {
+System.out.println("Processing card payment...");
+simulateProcessing();
+System.out.println("Payment successful via Card.");
+} else {
+System.out.println("Invalid card details. Payment failed.");
+return;
+}
+break;
+case 3:
+System.out.println("You chose Cash on Delivery. Pay when your order arrives.");
+break;
+default:
+System.out.println("Invalid payment option. Checkout failed.");
+return;
+}
+System.out.println("\nOrder placed successfully. Thank you, " + currentUser.getUsername() + "!");
+cart.clear();
+}
+private static void simulateProcessing() {
+try {
+Thread.sleep(1500); // Simulate processing time
+} catch (InterruptedException e) {
+Thread.currentThread().interrupt();
+}
+}
+}
+
+
+
+
+Output : 
+
+          
+
+Enter username: Gautham
+Enter password: 1234
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 0
+Thank you for using Mini E-Commerce!
+
+Enter username: Jahnavi
+Enter password: pass
+Login successful. Welcome, Jahnavi!
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 0
+Thank you for using Mini E-Commerce!
+
+Enter username: Nithish
+Enter password: mikepass
+Login successful. Welcome, Nithish!
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 0
+Thank you for using Mini E-Commerce!
+
+Enter username: Himaya
+Enter password: himaya123
+Login successful. Welcome, Himaya!
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 0
+Thank you for using Mini E-Commerce!
+
+Enter username: Girisha
+Enter password: girisha456
+Login successful. Welcome, Girisha!
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 0
+Thank you for using Mini E-Commerce!
+
+ii) View Products:
+
+Enter username: admin 
+Enter password: admin@123
+Login successful. Welcome, admin!
+
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 1
+
+--- Product Catalog ---
+1. T-Shirt - $15.0
+2. Jeans - $40.0
+3. Sneakers - $60.0
+4. Backpack - $35.0
+1. Classic Cotton T-Shirt - $15.0
+2. Slim Fit Blue Jeans - $40.0
+3. AirMax Running Sneakers - $60.0
+4. Urban Trek Backpack - $35.0
+5. Apple AirPods Pro - $249.0
+6. Samsung Galaxy Watch - $199.0
+7. Logitech Wireless Mouse - $29.99
+8. Sony WH-1000XM5 Headphones - $379.99
+9. Levi's Denim Jacket - $89.99
+10. Nike Sports Cap - $25.0
+11. Adidas Gym Bag - $55.0
+12. HP Pavilion Laptop - $699.0
+13. Amazon Kindle Paperwhite - $129.99
+Enter product ID to add to cart (0 to return):
+
+iii)Select Products:
+
+Enter username: admin
+Enter password: admin@123
+Login successful. Welcome, admin!
+
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 1
+
+--- Product Catalog ---
+1. T-Shirt - $15.0
+2. Jeans - $40.0
+3. Sneakers - $60.0
+4. Backpack - $35.0
+5. Classic Cotton T-Shirt - $15.0
+6. Slim Fit Blue Jeans - $40.0
+7. AirMax Running Sneakers - $60.0
+8. Urban Trek Backpack - $35.0
+9. Apple AirPods Pro - $249.0
+10. Samsung Galaxy Watch - $199.0
+11. Logitech Wireless Mouse - $29.99
+12. Sony WH-1000XM5 Headphones - $379.99
+13. Levi's Denim Jacket - $89.99
+14. Nike Sports Cap - $25.0
+15. Adidas Gym Bag - $55.0
+16. HP Pavilion Laptop - $699.0
+17. Amazon Kindle Paperwhite - $129.99
+Enter product ID to add to cart (0 to return): 3
+Enter quantity: 1
+Added to cart.
+Enter product ID to add to cart (0 to return): 1
+Enter quantity: 1
+Added to cart.
+Enter product ID to add to cart (0 to return): 2
+Enter quantity: 1
+Added to cart.
+Enter product ID to add to cart (0 to return): 0
+
+
+iv) View Cart :
+
+Enter username: admin
+Enter password: admin@123
+Login successful. Welcome, admin!
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 2
+
+--- Your Cart ---
+Sneakers x1 = $60.0
+T-Shirt x1 = $15.0
+Jeans x1 = $40.0
+Total Amount: $115.0
+
+V) Checkout:
+
+Enter username: admin
+Enter password: admin@123
+Login successful. Welcome, admin!
+1. View Products
+2. View Cart
+3. Checkout
+4. Logout
+0. Exit
+Choose an option: 3
+
+--- Your Cart ---
+Sneakers x1 = $60.0
+T-Shirt x1 = $15.0
+Jeans x1 = $40.0
+Total Amount: $115.0
+Confirm checkout? (yes/no): yes
+
+vi) PAYMENT PROCESS:(yes)
+
+--- Payment Options ---
+1. UPI
+2. Credit/Debit Card
+3. Cash on Delivery
+Choose a payment method: 1
+Enter UPI ID (e.g., name@bank): 9908990390@axl
+Processing UPI payment...
+Payment successful via UPI.
+Order placed successfully. Thank you, admin!
+
+vii) PAYMENT PROCESS:(no)
+
+--- Your Cart ---
+Apple AirPods Pro x1 = $249.0
+Total Amount: $249.0
+Confirm checkout? (yes/no): no
+Checkout 
